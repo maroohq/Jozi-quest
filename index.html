@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#0b0d10" />
+  <meta name="description" content="Jozi Quest is a transport-aware Johannesburg location game for newcomers." />
+  <title>Jozi Quest — Learn Johannesburg by Playing</title>
+  <link rel="preconnect" href="https://tiles.openfreemap.org" crossorigin>
+  <link rel="preconnect" href="https://unpkg.com" crossorigin>
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@^6.11.2/dist/maplibre-gl.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main id="app">
+    <section class="welcome" id="welcomePanel" aria-labelledby="title">
+      <div class="noise"></div>
+      <nav class="landing-nav">
+        <button class="wordmark" type="button" aria-label="Jozi Quest home">
+          <span class="wordmark-mark">JQ</span>
+          <span>Jozi Quest</span>
+        </button>
+        <div class="landing-status"><i></i> Johannesburg beta</div>
+      </nav>
+
+      <div class="landing-grid">
+        <div class="hero-copy">
+          <div class="eyebrow"><span></span> CITY ORIENTATION, BUT MAKE IT A GAME</div>
+          <h1 id="title">Get lost in Jozi.<br><em>On purpose.</em></h1>
+          <p class="lede">Learn Johannesburg the way you actually move through it. Guess taxi ranks, roads, landmarks and useful stops until the city starts making sense.</p>
+
+          <div class="hero-actions-row">
+            <button id="startBtn" class="primary hero-cta">Start a 5-round run <span>↗</span></button>
+            <div class="high-score-pill"><small>PERSONAL BEST</small><strong id="homeHighScore">—</strong></div>
+          </div>
+
+          <div class="setup-grid">
+            <div class="setup-card">
+              <div class="setup-label"><b>01</b><span>How do you move?</span></div>
+              <div class="choice-grid four" id="transportChips">
+                <button class="choice active" data-mode="walk"><span class="choice-icon">🚶</span><span>Walk</span></button>
+                <button class="choice" data-mode="drive"><span class="choice-icon">🚗</span><span>Drive</span></button>
+                <button class="choice" data-mode="taxi"><span class="choice-icon">🚐</span><span>Taxi</span></button>
+                <button class="choice" data-mode="cycle"><span class="choice-icon">🚲</span><span>Cycle</span></button>
+              </div>
+            </div>
+
+            <div class="setup-card">
+              <div class="setup-label"><b>02</b><span>What should Jozi teach you?</span></div>
+              <div class="choice-grid categories" id="categoryChips">
+                <button class="choice active" data-category="mixed"><span class="choice-icon">✦</span><span>Mixed</span></button>
+                <button class="choice" data-category="taxi"><span class="choice-icon">↔</span><span>Ranks</span></button>
+                <button class="choice" data-category="road"><span class="choice-icon">╱</span><span>Roads</span></button>
+                <button class="choice" data-category="landmark"><span class="choice-icon">◎</span><span>Places</span></button>
+                <button class="choice" data-category="garage"><span class="choice-icon">⛽</span><span>Fuel</span></button>
+              </div>
+            </div>
+          </div>
+
+          <div class="microcopy"><span>5 rounds</span><span>3D map</span><span>No sign-up</span><span>Works on mobile</span></div>
+        </div>
+
+        <div class="city-stage" aria-hidden="true">
+          <div class="city-halo"></div>
+          <div class="city-map">
+            <div class="map-grid"></div>
+            <div class="map-road road-a"></div><div class="map-road road-b"></div><div class="map-road road-c"></div><div class="map-road road-d"></div><div class="map-road road-e"></div>
+            <div class="zone z-sandton"><small>01</small><b>SANDTON</b></div>
+            <div class="zone z-rosebank"><small>02</small><b>ROSEBANK</b></div>
+            <div class="zone z-braam"><small>03</small><b>BRAAM</b></div>
+            <div class="zone z-cbd"><small>04</small><b>CBD</b></div>
+            <div class="zone z-soweto"><small>05</small><b>SOWETO</b></div>
+            <div class="map-pin pin-a"></div><div class="map-pin pin-b"></div><div class="map-pin pin-c"></div>
+          </div>
+          <div class="floating-card fc-one"><span>🚐</span><div><small>NEXT SKILL</small><strong>Taxi ranks</strong></div></div>
+          <div class="floating-card fc-two"><span>+876</span><div><small>LAST GUESS</small><strong>1.2 km away</strong></div></div>
+          <div class="stage-caption"><span>26.2041° S</span><span>28.0473° E</span><b>JHB</b></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="game hidden" id="gamePanel">
+      <div id="map" role="application" aria-label="Interactive Johannesburg map"></div>
+      <div class="map-vignette"></div>
+      <header class="topbar">
+        <button id="homeBtn" class="brand" aria-label="Back to home">JQ</button>
+        <div class="round-progress"><div class="progress-label"><span id="roundLabelTop">Round 1</span><span>5-round run</span></div><div class="progress-track"><div id="progressBar"></div></div></div>
+        <div class="score"><small>SCORE</small><strong id="scoreValue">0</strong></div>
+      </header>
+
+      <aside class="challenge-card" id="challengeCard">
+        <div class="round-meta"><span id="roundLabel">ROUND 1 / 5</span><span class="mode-pill" id="modeBadge">WALK</span></div>
+        <div class="type-line"><span id="categoryIcon">◎</span><span id="categoryLabel">LANDMARK</span></div>
+        <h2 id="questionTitle">Find this place</h2>
+        <p id="questionClue"></p>
+        <div class="transport-tip" id="transportTip"></div>
+        <div class="actions">
+          <button id="hintBtn" class="secondary">Use hint <span>−150</span></button>
+          <button id="submitBtn" class="primary compact" disabled>Lock guess <span>↗</span></button>
+        </div>
+        <div class="result hidden" id="resultBox">
+          <div class="result-score"><strong id="roundPoints">+0</strong><span id="distanceText">0 km away</span></div>
+          <p id="learningText"></p>
+          <button id="nextBtn" class="primary compact">Next round <span>→</span></button>
+        </div>
+        <p class="instruction" id="instruction">Click anywhere on the map to place your guess.</p>
+      </aside>
+
+      <div class="map-hud">
+        <button id="tiltBtn" title="Toggle 3D tilt">3D</button>
+        <button id="resetViewBtn" title="Reset Johannesburg view">⌂</button>
+      </div>
+    </section>
+
+    <section class="finish hidden" id="finishPanel">
+      <div class="finish-orbit"></div>
+      <div class="finish-card">
+        <div class="eyebrow centered"><span></span> RUN COMPLETE <span></span></div>
+        <h2 id="finishHeading">You’re starting to read Jozi.</h2>
+        <div class="final-score"><span id="finalScore">0</span><small>/ 5000</small></div>
+        <p id="finishCopy"></p>
+        <div class="finish-grid" id="finishStats"></div>
+        <div class="finish-actions"><button id="againBtn" class="primary">Play again <span>↗</span></button><button id="changeBtn" class="secondary">Change mode</button></div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
